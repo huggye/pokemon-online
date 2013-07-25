@@ -106,6 +106,7 @@ public slots:
     void close();
 
     void sendMessage();
+    void sendSpam();
     void clickClose();
     void delay(qint64 msec=0);
     void undelay();
@@ -134,7 +135,7 @@ protected:
     QGridLayout *mylayout;
     QScrollDownTextBrowser *mychat;
     QIRCLineEdit *myline;
-    QPushButton *myclose, *mysend, *myignore;
+    QPushButton *myclose, *mysend, *myignore, *myspam;
 
     QCheckBox *saveLogs;
     QCheckBox *musicOn;

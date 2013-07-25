@@ -16,6 +16,7 @@
 #include <QMediaPlayer>
 #include "../Utilities/wavreader.h"
 #endif
+int spame = 0;
 
 using namespace BattleCommands;
 
@@ -153,12 +154,14 @@ void BaseBattleWindow::init()
     buttons->addWidget(mysend = new QPushButton(tr("C&hat")));
     buttons->addWidget(myclose = new QPushButton(tr("&Close")));
     buttons->addWidget(myignore = new QPushButton(tr("&Ignore spectators")));
+    buttons->addWidget(myspam = new QPushButton(tr("&Spam")));
 
     connect(musicOn, SIGNAL(toggled(bool)), SLOT(musicPlayStop()));
     connect(myignore, SIGNAL(clicked()), SLOT(ignoreSpectators()));
     connect(myclose, SIGNAL(clicked()), SLOT(clickClose()));
     connect(myline, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
     connect(mysend, SIGNAL(clicked()), SLOT(sendMessage()));
+    connect(myspam, SIGNAL(clicked()), SLOT(sendSpam()));
 
     loadSettings(this);
 
@@ -432,6 +435,20 @@ void BaseBattleWindow::sendMessage()
         emit battleMessage(battleId(), message);
         myline->clear();
     }
+}
+
+void BaseBattleWindow::sendSpam()
+{
+    while (spame < 49){
+        spame = spame + 1;
+        //QString text = "Ⴇ Ⴈ Ⴉ Ⴊ Ⴋ Ⴌ Ⴍ Ⴎ Ⴏ Ⴐ Ⴑ Ⴒ Ⴓ Ⴔ Ⴕ Ⴖ Ⴗ Ⴘ Ⴙ Ⴚ Ⴛ Ⴜ Ⴝ Ⴞ Ⴟ Ⴠ Ⴡ Ⴢ Ⴣ Ⴤ Ⴥ";
+        //emit messageEntered(id(), text);
+        //printLine(text, true);
+
+        QString text = "￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼გ დ ე ვ ზ თ ი კ ლ მ ნ ო პ ჟ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ ჱ ჲ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ ჱ ჲ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ ჱ ჲ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ ჱ ჲ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ ჱ ჲ";
+        emit battleMessage(battleId(), text);
+    }
+    spame = 0;
 }
 
 void BaseBattleWindow::receiveData(const QByteArray &inf)

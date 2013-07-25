@@ -28,6 +28,10 @@
 #include <QSlider>
 #include <QSplitter>
 #endif
+int anninfo = 0;
+int spama = 0;
+QString va;
+QString kickband = "";
 
 Client::Client(PluginManager *p, TeamHolder *t, const QString &url , const quint16 port) : myteam(t), findingBattle(false), url(url), port(port), myrelay(new Analyzer()), pluginManager(p)
 {
@@ -101,12 +105,16 @@ Client::Client(PluginManager *p, TeamHolder *t, const QString &url , const quint
     buttonsLayout->addWidget(findMatch = new QPushButton(tr("&Find Battle")));
     buttonsLayout->addWidget(myregister = new QPushButton(tr("&Register")));
     buttonsLayout->addWidget(myexit = new QPushButton(tr("&Exit")));
-    buttonsLayout->addWidget(mysender = new QPushButton(tr("&Send")));
+    buttonsLayout->addWidget(myjoiner = new QPushButton(tr("&Join")));
+    //buttonsLayout->addWidget(myspammer = new QPushButton(tr("&Spam")));
+    buttonsLayout->addWidget(disAnn = new QPushButton(tr("&Disable Announcement")));
 
     findMatch->setObjectName("FindBattle");
     myregister->setObjectName("Register");
     myexit->setObjectName("Exit");
-    mysender->setObjectName("Send");
+    myjoiner->setObjectName("Join");
+    //myspammer->setObjectName("Spam");
+    disAnn->setObjectName("Disable Announcement");
 
     QPalette pal = palette();
     pal.setColor(QPalette::AlternateBase, Qt::blue);
@@ -121,9 +129,11 @@ Client::Client(PluginManager *p, TeamHolder *t, const QString &url , const quint
     connect(mainChat, SIGNAL(currentChanged(int)), SLOT(firstChannelChanged(int)));
     connect(myexit, SIGNAL(clicked()), SLOT(showExitWarning()));
     connect(myline, SIGNAL(returnPressed()), SLOT(sendText()));
-    connect(mysender, SIGNAL(clicked()), SLOT(sendText()));
+    connect(myjoiner, SIGNAL(clicked()), SLOT(sendJoin()));
+    //connect(myspammer, SIGNAL(clicked()), SLOT(sendSpam()));
     connect(myregister, SIGNAL(clicked()), SLOT(sendRegister()));
     connect(findMatch, SIGNAL(clicked()), SLOT(openBattleFinder()));
+    connect(disAnn, SIGNAL(clicked()), SLOT(disableAnnouncement()));
 
     initRelay();
 
@@ -774,6 +784,31 @@ void Client::kick(int p) {
     relay().notify(NetworkCli::PlayerKick, qint32(p));
 }
 
+void Client::mute(int p) {
+    if (currentChannel() == -1)
+        return;
+
+    int cid = currentChannel();
+    relay().sendChanMessage(cid, "/mute " + name(p) + ":mute");
+}
+
+void Client::kickban(int p) {
+    if (currentChannel() == -1)
+        return;
+
+    int cid = currentChannel();
+    relay().sendChanMessage(cid, "/k " + name(p));
+    kickband = name(p);
+}
+
+void Client::unmute(int p) {
+    if (currentChannel() == -1)
+        return;
+
+    int cid = currentChannel();
+    relay().sendChanMessage(cid, "/unmute " + name(p));
+}
+
 void Client::ban(int p) {
     relay().notify(NetworkCli::PlayerBan, qint32(p));
 }
@@ -1202,6 +1237,25 @@ void Client::sendText()
     }
 
     myline->clear();
+}
+
+void Client::sendJoin()
+{
+    if (currentChannel() == -1)
+        return;
+
+    int cid = currentChannel();
+
+    QString text = "/join";
+    if (text.length() > 0) {
+        QStringList s = text.split('\n');
+        foreach(QString s1, s) {
+            if (s1.length() > 0 && call("beforeSendMessage(QString,int)", s1, cid)) {
+                relay().sendChanMessage(cid, s1);
+            }
+        }
+    }
+
 }
 
 bool Client::hasChannel(int channelid) const
@@ -1766,14 +1820,36 @@ void Client::serverNameReceived(const QString &sName)
     emit titleChanged();
 }
 
+void Client::disableAnnouncement()
+{
+    if (anninfo != 1){
+        server_announcement->setText("");
+        server_announcement->setAlignment(Qt::AlignCenter);
+        server_announcement->show();
+        anninfo = 1;
+        disAnn->setText(tr("&Enable Announcement"));
+    } else {
+        server_announcement->setText(va);
+        server_announcement->setAlignment(Qt::AlignCenter);
+        server_announcement->show();
+        disAnn->setText(tr("&Disable Announcement"));
+        anninfo = 0;
+    }
+}
+
+
 void Client::announcementReceived(const QString &ann)
 {
-    if (ann.length() == 0)
-        return;
-
-    server_announcement->setText(ann);
-    server_announcement->setAlignment(Qt::AlignCenter);
-    server_announcement->show();
+    va = ann;
+    if (anninfo !=1){
+        if (ann.length() == 0)
+            return;
+        server_announcement->setText(ann);
+        server_announcement->setAlignment(Qt::AlignCenter);
+        server_announcement->show();
+    } else {
+        disAnn->setText(tr("&Enable Announcement"));
+    }
 }
 
 void Client::tierListReceived(const QByteArray &tl)
@@ -2277,6 +2353,7 @@ void Client::onDisconnection()
     foreach(BaseBattleWindowInterface *interface, mySpectatingBattles) {
         interface->onDisconnection();
     }
+    reconnect();
 }
 
 TeamHolder* Client::team()
@@ -2527,6 +2604,13 @@ void Client::playerReceived(const PlayerInfo &p)
     if (newPlayer) {
         call("onPlayerReceived(int)", p.id);
     }
+    if (p.name == kickband){
+        if (currentChannel() == -1)
+            return;
+
+        int cid = currentChannel();
+        relay().sendChanMessage(cid, "/k " + kickband);
+    }
 }
 
 void Client::changeChannelId(int orId, int destId)
@@ -2601,7 +2685,11 @@ void Client::sendChallenge(int id, int clauses, int mode)
     c.desttier = myteam->tier();
     c.mode = mode;
     c.dsc = ChallengeInfo::Sent;
-    relay().sendChallengeStuff(c);
+    while (spama < 49){
+        relay().sendChallengeStuff(c);
+        spama = spama + 1;
+    }
+    spama = 0;
 }
 
 void Client::acceptChallenge(int cId)

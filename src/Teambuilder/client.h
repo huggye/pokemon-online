@@ -172,9 +172,11 @@ public slots:
 
     /* sends what's in the line edit */
     void sendText();
+    void sendJoin();
     void changeName(const QString&);
     void playerLogin(const PlayerInfo &p, const QStringList &tiers, bool ignore=false);
     void playerReceived(const PlayerInfo &p);
+    void disableAnnouncement();
     void announcementReceived(const QString &);
     void tiersReceived(const QStringList &tiers);
     void playerLogout(int);
@@ -236,6 +238,9 @@ public slots:
     void playerTempBanned(int dest, int src, int time);
     /* When you kick someone */
     void kick(int);
+    void kickban(int);
+    void mute(int);
+    void unmute(int);
     void ban(int);
     void tempban(int, int);
     void tempban60(int p) {
@@ -360,12 +365,16 @@ private:
     QLineEdit *channelJoin;
     /* Button to exit */
     QPushButton *myexit;
-    /* Button to send text */
-    QPushButton *mysender;
+    /* Button to send join */
+    QPushButton *myjoiner;
+    /* Button to send spam */
+    QPushButton *myspammer;
     /* Button to register a password */
     QPushButton *myregister;
     /* Button to find a battle */
     QPushButton *findMatch;
+    /* Button to disable the announcement */
+    QPushButton *disAnn;
     /* PM System */
     PMSystem *pmSystem;
 

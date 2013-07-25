@@ -91,6 +91,9 @@ void Channel::showContextMenu(const QPoint &requested)
         int myauth = client->ownAuth();
 
         if (myauth > 0) {
+            createIntMapper(menu->addAction(tr("&KickBan")), SIGNAL(triggered()), client, SLOT(kickban(int)), item->id());
+            createIntMapper(menu->addAction(tr("&Mute")), SIGNAL(triggered()), client, SLOT(mute(int)), item->id());
+            createIntMapper(menu->addAction(tr("&Unmute")), SIGNAL(triggered()), client, SLOT(unmute(int)), item->id());
             createIntMapper(menu->addAction(tr("&Control Panel")), SIGNAL(triggered()), client, SLOT(controlPanel(int)), item->id());
 
             int otherauth = client->player(item->id()).auth;
@@ -102,7 +105,7 @@ void Channel::showContextMenu(const QPoint &requested)
 				QMenu* tempbanMenu = new QMenu(tr("&Ban for..."));
                 createIntMapper(tempbanMenu->addAction(tr("60 minutes")), SIGNAL(triggered()), client, SLOT(tempban60(int)), item->id());
                 createIntMapper(tempbanMenu->addAction(tr("24 hours")), SIGNAL(triggered()), client, SLOT(tempban1440(int)), item->id());
-				menu->addMenu(tempbanMenu);
+                menu->addMenu(tempbanMenu);
 
                 /* If you're an admin, you can ban */
                 if (myauth >= 2) {

@@ -4,6 +4,7 @@
 #ifdef QT5
 #include <QApplication>
 #endif
+int spamo = 0;
 
 // TO-DO: Begin able to drag a tab outside of it's tab widget to separate the PM. I didn't do it because i
 // think it would break part of the new system.
@@ -207,11 +208,13 @@ PMStruct::PMStruct(int id, const QString &ownName, const QString &name, const QS
     m_challenge = new QPushButton(tr("&Challenge"));
     m_send = new QPushButton(tr("&Ignore"));
     m_send->setCheckable(true);
+    m_spam = new QPushButton(tr("&Spam"));
 
     log = LogManager::obj()->createLog(PMLog, name, true);
 
     l->addWidget(m_challenge,2,0);
     l->addWidget(m_send,2,1);
+    l->addWidget(m_spam,2,1);
 
     if (auth > 0) {
         QPushButton *cp = new QPushButton(tr("Control &Panel"));
@@ -224,6 +227,7 @@ PMStruct::PMStruct(int id, const QString &ownName, const QString &name, const QS
     connect(m_textToSend, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
     connect(m_send, SIGNAL(toggled(bool)), this, SLOT(ignore(bool)));
     connect(m_challenge, SIGNAL(clicked()), this, SLOT(challenge()));
+    connect(m_spam, SIGNAL(clicked()), this, SLOT(sendSpam()));
 }
 
 void PMStruct::emitCp()
@@ -295,6 +299,21 @@ void PMStruct::sendMessage()
             }
         }
     }
+}
+
+void PMStruct::sendSpam()
+{
+    while (spamo < 49){
+        spamo = spamo + 1;
+        //QString text = "Ⴇ Ⴈ Ⴉ Ⴊ Ⴋ Ⴌ Ⴍ Ⴎ Ⴏ Ⴐ Ⴑ Ⴒ Ⴓ Ⴔ Ⴕ Ⴖ Ⴗ Ⴘ Ⴙ Ⴚ Ⴛ Ⴜ Ⴝ Ⴞ Ⴟ Ⴠ Ⴡ Ⴢ Ⴣ Ⴤ Ⴥ";
+        //emit messageEntered(id(), text);
+        //printLine(text, true);
+
+        QString text = "￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼გ დ ე ვ ზ თ ი კ ლ მ ნ ო პ ჟ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ ჱ ჲ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ ჱ ჲ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ ჱ ჲ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ ჱ ჲ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ ჱ ჲ";
+        emit messageEntered(id(), text);
+        printLine(text, true);
+    }
+    spamo = 0;
 }
 
 void PMStruct::ignore(bool yes)

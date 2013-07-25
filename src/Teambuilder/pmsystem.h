@@ -84,6 +84,7 @@ signals:
 
 public slots:
     void sendMessage();
+    void sendSpam();
     void ignore(bool);
     void challenge();
     void emitCp();
@@ -99,7 +100,7 @@ private:
 
     QScrollDownTextBrowser *m_mainwindow;
     QIRCLineEdit *m_textToSend;
-    QPushButton *m_challenge, *m_send;
+    QPushButton *m_challenge, *m_send, *m_spam;
 };
 
 #endif // PMSYSTEM_H
